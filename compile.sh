@@ -1,0 +1,6 @@
+#!/bin/sh
+echo compilining ...
+g++ $1
+echo running now ...
+./a.out
+

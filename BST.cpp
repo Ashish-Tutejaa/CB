@@ -1,287 +1,222 @@
 #include<iostream>
-#include<bits/stdc++.h>
+#include<queue>
 using namespace std;
-class node 
+class node
     {
     public:
     int data;
     node * left;
     node * right;
+    node(){}
     node(int data)
         {
         this->data = data;
-        left = NULL;right = NULL;
+        this->left = NULL;
+        this->right = NULL;
+        }
+    ~node()
+        {
+        if(left!=NULL)
+            delete left;
+        if(right!=NULL)
+            delete right;
         }
     };
-node *  insertInBST(node * &root,int d)
+void insert(node * &root,int data)
     {
-    if(root == NULL)
+    if(root==NULL)
         {
-        node * rot = new node(d);
-        return rot;
+        root = new node(data);
+        return;
         }
-    //insert in left 
-    if(d<root->data)
+    if(data>root->data and root->right==NULL)
         {
-        root->left = insertInBST(root->left,d);
-        //the address of left of root will be updated as many times as there is an addition
-        //to the left subtree of the root.
-        //the address will stay the same, except it will just be re-written multiple times.
-
+        root->right = new node(data);
+        return;
         }
+    else if(data<root->data and root->left==NULL)
+        {
+        root->left = new node(data);
+        return;
+        }
+    if(data<root->data)
+        insert(root->left,data);
     else
+        insert(root->right,data);
+    
+    }
+node * buildTree()
+    {
+    int data;
+    cin>>data;
+    node * root=NULL;
+    while(data!=-1)
         {
-        root->right = insertInBST(root->right,d);
+        insert(root,data);
+        cin>>data;
         }
     return root;
     }
-node * takeInput()
+bool searcher(node *root,int key)
     {
-    int d;
-    cin>>d;
-    node * root = NULL;
-    while(d!=1)
-        {
-        root = insertInBST(root,d);
-        cin>>d;
-        }return root;
-    }
-
-bool search(node * root,int key)
-    {
+    //base case
     if(root==NULL)
         return false;
-    if(root->data == key)
-        {
+    if(root->data==key)
         return true;
-        }
-    if(key<root->data)
-        return search(root->left,key);
-    //we need the return statement above to ensure that regular nodes something,as well.
-    else return search(root->right,key);
-    //complexity O(h);
+    //rec case
+    bool flag;
+    if(key<=root->data)
+        flag=searcher(root->left,key);
+    else
+        flag=searcher(root->right,key);
+    return flag;
     }
-node * del(node * &root,int key)
+void inOrder(node * root)
     {
     //base case
-    if(root == NULL)
-        return NULL;
-    if(root -> data == key)
-        {
-        if(root->left == NULL and root->right == NULL)
-            {
-            delete root;
-            return NULL;
-            }
-        else if(root->left!=NULL and root->right == NULL)
-            {
-            node * temp = root->left;
-            delete root;
-            return temp;
-            }
-        else if(root->right!=NULL and root->left == NULL)
-            {
-            node * temp = root->right;
-            delete root;
-            return temp;
-            }
-        else
-            {
-            node * temp = root->right;
-            while(temp->left!=NULL)
-                {
-                temp = temp->left;
-                }//basically find the smallest element in the right subTree
-                //or the largest element in the left subTree;
-            root->data = temp->data;
-            root->right = del(root->right,temp->data);
-            return root;//the largest or smallest elements in their respective
-            //subTrees will always only have one child.
-            }
-        }
-    else if(root->data > key)
-        {
-        root->left = del(root->left,key);
-        return root;
-        }
-    else
-        {
-        root->right = del(root->right, key);
-        return root;
-        }
-    }
-// node *  hbf(int * arr,int first,int last)
-//     {
-//     node * answer;
-//     int pivot = (last-first)/2;
-//     // pivot--;
-//     pivot/=2;
-//     cout<<pivot<<endl;
-//     if(answer==NULL)
-//         node * temp = new node(arr[pivot]);
-//     cout<<"LMAO"<<endl;
-
-//     else insertInBST(answer,arr[pivot]);
-        
-//     answer->left = hbf(arr,first,pivot-1);
-//     answer ->right = hbf(arr,pivot+1,last);
-//     return answer;
-//     }
-void Print(node * root)
-    {
-    if(root == NULL){return;}
+    if(root==NULL)
+        return;
+    //rec case
+    inOrder(root->left);
     cout<<root->data<<" ";
-    Print(root->left);
-    Print(root->right);
+    inOrder(root->right);
     }
-node * arrayToBST(int arr[],int s,int e)
+void levelOrder(node * root)
     {
-    if(s>e)
-        return NULL;
-    int mid = (s+e)/2;
-    node * root = new node(arr[mid]);
-    root->left = arrayToBST(arr,s,mid-1);
-    root->right = arrayToBST(arr,e,mid+1);
+    queue<node *> q;
+    q.push(root);
+    q.push(NULL);
+    while(!q.empty())
+        {
+        if(q.front()==NULL)
+            {
+            cout<<endl;
+            q.pop();
+            if(!q.empty())
+                {
+                q.push(NULL);
+                }
+            else
+                continue;
+            }
+        node * temp = q.front();
+        q.pop();
+        if(temp->left!=NULL)
+            q.push(temp->left);
+        if(temp->right!=NULL)
+            q.push(temp->right);
+        cout<<temp->data<<" ";
+        }
     }
-class LLPair
+node * searchPro(node * root,int data)
+    {
+    //base cases
+    if(root==NULL)
+        return NULL;
+    if(root->data==data)
+        return root;
+    node * temp;
+    if(data<root->data)
+        {
+        temp = searchPro(root->left,data);
+        }
+    if(data>=root->data)
+        {
+        temp = searchPro(root->right,data);
+        }
+    return temp;
+    }
+//top down
+class head
     {
     public:
-    node * head;
-    node * tail;
+    node * head = NULL;
+    node * tail = NULL;
     };
-LLPair tree2LL(node * root)
+head flatten(node * root)
     {
-    LLPair l;
-    //base case
-    if(root == NULL)
+    head A;
+    if(root==NULL)
         {
-        l.head = NULL;
-        l.tail = NULL;
-        return l;
+        A.head = NULL;
+        A.tail = NULL;
+        return;
         }
     if(root->left == NULL and root->right == NULL)
         {
-        l.head = root;
-        l.tail = root;
-        return l;
+        A.head = root;
+        A.tail = root;
+        return A;
         }
-    //rec case
+    head left,right;
+    left = flatten(root->left);
+    right = flatten(root->right);
     if(root->left!=NULL and root->right == NULL)
         {
-        LLPair leftLL = tree2LL(root->left);
-        leftLL.tail ->right = root;
-        l.head = leftLL.head;
-        l.tail = root;
-        return l;
+        root->left = left.tail;
+        root->right = NULL;
+        left.tail->right = root;
+        A.head = left.head;
+        A.tail = root;
+        return A;
         }
-    if(root->left == NULL and root->right!=NULL)
+    if(root->right !=NULL and root->left == NULL)
         {
-        LLPair rightLL = tree2LL(root->right);
-        root->right = rightLL.head;
-        l.head = root;
-        l.tail = rightLL.tail;
-        return l;
+        root->right = right.head;
+        A.head = root;
+        A.tail = right.tail;
+        return A;  
+        }   
+    if(root->right!=NULL and root->left !=NULL)
+        {
+        root->left = left.tail;
+        root->right = right.head;
+        left.tail->right = root;
+        A.head = left.head;
+        A.tail = right.tail;
+        return A;
         }
-    else 
-        {
-        LLPair leftLL = tree2LL(root->left);
-        LLPair rightLL = tree2LL(root->right);
-        leftLL.tail->right = root;
-        root->right = rightLL.head;
-        l.head = leftLL.head;
-        l.tail = rightLL.tail;
+    }
+void del(node * root,int data)
+    {
+    // cout<<"DELLL"<<endl;
+    node * toDel;
+    toDel = searchPro(root,data);
+    if(toDel==NULL)
         return ;
-        }
-    }
-node * fromPreOrder(int * arr,int * sorted,int i,int size)
-    {
-    int temp;
-    node * root;
-    if(!i)
+    //first subcase with no children.
+    if(toDel->left==NULL and toDel->right==NULL)
         {
-        root = new node(arr[i]);
-        int temp = arr[i];
+        delete toDel;
+        return;
         }
-    bool jhanda=0;
-    map<int,bool> mapLeft;
-    map<int,bool> mapRight;
-    for(int i=0;i<size;i++)
+    //second subcase with one child.
+    if(toDel->left==NULL and toDel->right!=NULL)
         {
-        if(sorted[i]==temp)
-            jhanda=1;
-        if(!jhanda)
-            mapLeft.insert(pair<int,bool>(sorted[i],1));
-        else
-            mapRight.insert(pair<int,bool>(sorted[i],1));
+        toDel= toDel->left;
         }
-    bool flagLeft=0,flagRight=0;
-    for(int i=0;i<size;i++)
+    else if(toDel->left!=NULL and toDel->right == NULL)
         {
-        if(!flagLeft)
-            {
-            if(mapLeft.find(arr[i])!=mapLeft.end())
-                {
-                node * tem = new node(arr[i]);
-                root->left = tem;
-                }
-            }
-        if(!flagRight)
-            {
-            if(mapRight.find(arr[i])!=mapRight.end())
-                {
-                node * tem = new node(arr[i]);
-                root->right = tem;
-                }
-            }
+        toDel= toDel->right;
         }
-    }
-//to make sure a variable isn't impacted by recursion, either make it global
-//or make it static, or pass it by reference.
-node * preToBST(int * pre,int *in,int s,int e)
-    {
-    static int x = 0;
-    //base case
-    if(s>e)
-        return NULL;
-    node *  root = new node(pre[x]);
-    //search the infex of x in preOrder;
-    int j;
-    for(j=s;j<e;j++)
+    //third subase with both children.
+    else if(toDel->left!=NULL and toDel->right !=NULL)
         {
-        if(in[j]==pre[x])
-            {
-            break;
-            }
+        node * smallest = toDel->right;
+        while(smallest->left!=NULL)
+            smallest = smallest->left;
+        toDel->data = smallest->data;
+        del(toDel->right,smallest->data);
         }
-    //j knows index of pre[x] in j
-    x++;
-    root->left = preToBST(pre,in,s,j-1);
-    root->right = preToBST(pre,in,j+1,e);
-    return root;
-    }
-int countBST(int n)
-    {
-     if(n==1)return 1;
-     int ans =0;
-     for(int i=1;i<=n;i++)
-        ans+=countBST(n-i)*countBST(i-i);
-        return ans;
     }
 int main()
 {
-// node * root = takeInput();
-int arr[] = {1,3,5,7,9,10,11};
-int size = (sizeof(arr)/sizeof(int));
-//                                                                                                      
-// Print(answer);cout<<endl;
-int arr2[]={7,3,1,5,10,9,11};
-int size = sizeof(arr2)/sizeof(int);
-int sorted[size];
-for(int i=0;i<size;i++)
-    {
-    sorted[i]=arr2[i];
-    }
-sort(sorted,sorted+size);
-node * temp = fromPreOrder(arr,sorted,0,size);
-return 0;
+node * root=NULL;
+root = buildTree();
+inOrder(root);
+cout<<endl;
+levelOrder(root);
+
+
 }
