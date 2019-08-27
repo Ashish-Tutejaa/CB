@@ -23,10 +23,6 @@ for(int i = 1;i<=n;i++)
     v.push_back(ins);
     }
 sort(v.begin(),v.end(),compare);
-for(auto x:v)
-    {
-    cout<<x.first<<" "<<x.second.first<<" "<<x.second.second<<endl;
-    }
 int totalTime = v[0].second.second + v[0].second.first;
 int avgWT[n] = {0};
 int avgTAT[n] = {0};
@@ -43,10 +39,10 @@ while(1)
 int waitTot =0;
 for(int i =0;i<n;i++)
     {
-    cout<<avgWT[i]<<" ";
+    // cout<<avgWT[i]<<" ";
     waitTot +=avgWT[i];
     }waitTot/=n;cout<<endl;
-cout<<waitTot<<endl;
+cout<<"AVG WAIT: "<<waitTot<<endl;
 int tat =0 ;
 for(int i =0;i<n;i++)
     {
@@ -54,8 +50,8 @@ for(int i =0;i<n;i++)
     }
 for(int i =0;i<n;i++)
     {
-    cout<<avgTAT[i]<<" ";
+    // cout<<avgTAT[i]<<" ";
     tat+=avgTAT[i];
     }tat/=n;cout<<endl;
-cout<<tat<<endl;
+cout<<"AVG TURN AROUND: "<<tat<<endl;
 }
